@@ -107,6 +107,7 @@ func newConnChan(conn net.Conn, r, s chan *pkt, ctrl chan *connChan) (ch *connCh
 func (c *connChan) clientHandshake(id []byte) (err error) {
 	c.id = id
 	if err = c.Encode(&pkt{Type: pktHandshake, Value: id}); err != nil {
+		panic(fmt.Sprintf("Encode fail %v", err))
 		return
 	}
 	p := &pkt{}
@@ -124,6 +125,7 @@ func (c *connChan) clientHandshake(id []byte) (err error) {
 func (c *connChan) serverHandshake() (err error) {
 	p := &pkt{}
 	if err = c.Decode(p); err != nil {
+		panic(fmt.Sprintf("Decode fail %v", err))
 		return
 	}
 	if p.Type != pktHandshake {
@@ -144,6 +146,7 @@ L:
 	for {
 		p := &pkt{srcID: c.id}
 		if err := c.Decode(&p); err != nil {
+			panic(fmt.Sprintf("Decode fail %v", err))
 			break
 		}
 
@@ -170,6 +173,7 @@ func (c *connChan) sender() {
 			}
 			if err := c.Encode(p); err != nil {
 				c.s <- p
+				panic(fmt.Sprintf("Encode fail %v", err))
 				break
 			}
 		}
